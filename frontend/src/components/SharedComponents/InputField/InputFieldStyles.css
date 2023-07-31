@@ -1,0 +1,13 @@
+.form-input {
+
+    border: none;
+    border-bottom: 1px solid #ff993a;
+    background-color: transparent;
+    outline: none;
+    caret-color: #282828;
+}
+
+.form-input::placeholder {
+
+    color: #858585;
+}

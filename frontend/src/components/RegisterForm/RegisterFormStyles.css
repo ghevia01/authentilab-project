@@ -1,0 +1,151 @@
+.register-page-content {
+
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.register-form {
+
+    width: 100%;
+    max-width: 46.875rem;
+    height: auto;
+    max-height: 100%;
+    padding: 0.9375rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 0.375rem 0.125rem rgb(177, 97, 0);
+}
+
+.register-form-h1 {
+
+    font-family: Arial, sans-serif;
+    font-size: 2.125rem;
+    text-align: center;
+    color: rgb(255, 136, 0);
+    text-shadow: 0.0625rem 0.0625rem 0.0625rem rgba(0, 0, 0, 0.628);
+}
+
+.register-form-hr {
+
+    width: 100%;
+    margin: 0.75rem 0 1.5625rem 0;
+    border: none;
+    border-bottom: 1px solid rgb(255, 153, 58);
+}
+
+.register-form-fieldset {
+
+    width: 100%;
+    border: none;
+}
+
+.hidden {
+
+    display: none;
+}
+
+.register-fieldset-container {
+
+    width: 100%;
+}
+
+.register-field-container {
+
+    margin: 0.625rem;
+    width: 45%;
+}
+
+.register-input-field {
+
+    width: 100%;
+    height: 2.5rem;
+    margin: 0.3125rem 0;
+    border: 0.0625rem solid rgb(255, 153, 58);
+    border-radius: 5px;
+    padding-left: 0.3125rem;
+    padding-right: 0.3125rem;
+    border-bottom: 2px solid rgb(255, 153, 58);
+}
+
+.select-gender-placeholder {
+
+    color: #858585;
+}
+
+select:hover {
+
+    cursor: pointer;
+}
+
+.register-input-label {
+
+    width: 100%;
+}
+
+.register-field-error-msg {
+
+    font-size: 0.75rem;
+    width: 100%;
+    height: 0.9375rem;
+    color: #ff0000;
+}
+
+.signup-btn {
+
+    width: 60%;
+    margin-top: 0.9375rem;
+    margin-bottom: 0.75rem;
+}
+
+.sign-in-text {
+
+    font-family: Arial, sans-serif;
+    font-size: 0.8125rem;
+    text-decoration: none;
+    text-align: center;
+    margin-top: 0.9375rem;
+    margin-bottom: 0.9375rem;
+    color: #858585;
+}
+
+.form-link {
+
+    color: rgb(255, 94, 0);
+}
+
+.form-link:hover {
+
+    color: #565656;
+}
+
+@media (max-width: 775px) {
+
+    .register-page-content {
+        height: auto;
+    }
+    .register-field-container {
+        width: 100%;
+    }
+
+    .register-input-field {
+        width: 100%;
+    }
+
+    .register-field-error-msg {
+
+        height: auto;
+    }
+}
+
+/* .terms-and-cond {
+
+    width: 92%;
+    font-family: Arial, sans-serif;
+    font-size: 0.8125rem;
+    text-decoration: none;
+    margin-top: 0.9375rem;
+    margin-bottom: 0.9375rem;
+    color: #858585;
+    align-items: flex-start;
+} */

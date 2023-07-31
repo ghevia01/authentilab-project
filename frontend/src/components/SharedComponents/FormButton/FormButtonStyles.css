@@ -1,0 +1,26 @@
+.form-button {
+
+    padding: 6px 0;
+    border: none;
+    border-radius: 5px;
+    background: #FF8C00;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 3px 3px 0 #9b5500;
+    transition: background-color 0.2s ease;
+}
+
+.form-button:hover {
+
+    background: #FFA500;
+}
+
+.form-button:active {
+
+    background: #FF8C00;
+    transform: translateY(1px);
+}
