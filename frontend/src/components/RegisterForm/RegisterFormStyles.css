@@ -58,6 +58,7 @@
 
 .register-input-field {
 
+    font-size: 0.9375em;
     width: 100%;
     height: 2.5rem;
     margin: 0.3125rem 0;
@@ -124,6 +125,7 @@ select:hover {
     .register-page-content {
         height: auto;
     }
+    
     .register-field-container {
         width: 100%;
     }

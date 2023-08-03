@@ -9,6 +9,12 @@ import LoadingAnimation from '../SharedComponents/LoadingAnimation/LoadingAnimat
 
 import './LoginFormStyles.css';
 
+// Error messages for form validation
+const errorMessages = {
+
+    userName: 'Enter a valid username or email address.',
+    password: 'Enter a valid password.',
+};
 
 // Login form component
 const LoginForm = () => {
@@ -41,13 +47,6 @@ const LoginForm = () => {
 
     // Form state containing the loading status
     const [isLoading, setIsLoading] = useState(false);
-
-    // Error messages for form validation
-    const errorMessages = {
-
-        userName: 'Enter a valid username or email address.',
-        password: 'Enter a valid password.',
-    };
 
     // Log the updated validationErrors whenever it changes
     useEffect(() => {
@@ -99,28 +98,28 @@ const LoginForm = () => {
                 } else {
 
                     // Show a general error message
-                    setValidationErrors((validationErrors) => ({ ...validationErrors, userName: data.message }));
+                    setValidationErrors((validationErrors) => ({ ...validationErrors, userName: response.statusText }));
                 }
 
             } catch (error) {
 
                 // Log and show a general error message
                 console.log(error);
-                setValidationErrors((validationErrors) => ({ ...validationErrors, userName: data.message }));
+                const errorMessage = error.message || 'An error occurred while fetching the data';
+                setValidationErrors((validationErrors) => ({ ...validationErrors, userName: errorMessage }));
 
             } finally {
 
                 setIsLoading(false); // Set the loading state back to false
             }
         }
-    };
+    }; 
 
+    // Send --POST-- request to the server with the login form data
     const sendUserLoginData = async (e) => {
 
         // Destructure the loginFormData object
         const { userName, password } = loginFormData;
-        
-        console.log(process.env.REACT_APP_LOGIN_URL);
         
         try {
             // Send the login form data to the server
@@ -157,7 +156,6 @@ const LoginForm = () => {
         }
     };
     
-
     //------------------------------------------------------ Form Validation --------------------------------------------------------->
 
     // Form Validation Functions
@@ -237,6 +235,12 @@ const LoginForm = () => {
         setIsFormSubmitted(false);
         resetValidationErrors();
     };
+    
+    //------------------------------------------------------ Form Toggles --------------------------------------------------------->
+
+    const togglePasswordVisibility = () => {
+        setIsPasswordVisible(!isPasswordVisible);
+    };
 
     //------------------------------------------------------ Form Rendering --------------------------------------------------------->
 
@@ -283,7 +287,7 @@ const LoginForm = () => {
                     placeholder="Password"
                     aria-label="Password"
                 />
-                <button type="button" className='password-icon-btn' onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
+                <button type="button" className='password-icon-btn' onClick={togglePasswordVisibility}>
                     <FontAwesomeIcon  className='password-eye-icon' icon={isPasswordVisible ? faEye : faEyeSlash} />
                 </button>
             </div>
@@ -291,11 +295,11 @@ const LoginForm = () => {
             <FormButton type="submit" className='login-form-btn' id="loginBtn" name="loginBtn" text="Sign In"></FormButton>
 
             <small className="register-text">
-                Don't have an account yet? <Link className="form-link" to="/register">Register</Link>
+                Don't have an account yet? <Link to="/register" className="form-link" >Register</Link>
             </small>
 
             <small className="access-help-text">
-                <a className="form-link" href="#">Can't access your account? </a>
+                <Link to="/access-help" className="form-link">Can't access your account? </Link>
             </small>
 
             {/* If the loading state is true, display the loading spinner */}

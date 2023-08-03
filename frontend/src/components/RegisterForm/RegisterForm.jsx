@@ -7,7 +7,31 @@ import LoadingAnimation from '../SharedComponents/LoadingAnimation/LoadingAnimat
 
 import './RegisterFormStyles.css';
 
-// Login form component
+// ------------------------------------------------------ Register Form Var and Const and Objects --------------------------------------------------------->
+
+// Regular expressions for form validation
+const firstNameRegex = /^[A-Za-z]{2,}$/;
+const lastNameRegex = /^[A-Za-z]{2,}$/;
+const userNameRegex = /^[a-zA-Z][a-zA-Z0-9]{2,15}$/;
+const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/
+
+// Error messages for form validation
+const errorMessages = {
+    firstName: 'First name must have at least 2 characters and contain only letters.',
+    lastName: 'Last name must have at least 2 characters and contain only letters.',
+    gender: 'Field cannot be empty',
+    country: 'Field cannot be empty',
+    userName: 'Username must contain only letters and numbers and must start with a letter.',
+    email: 'Invalid email address.',
+    password: 'Password must contain at least 8 characters, one uppercase and lowercase letter, one number and one special character.',
+    rePassword: 'Passwords do not match.',
+};
+
+
+
+//------------------------------------------------------ Register Form Component --------------------------------------------------------->
+
 const RegisterForm = () => {
 
     // Form data state containing username and password
@@ -34,23 +58,7 @@ const RegisterForm = () => {
         email: false,
         password: false,
     });
-
-    // Form state containing the validation error messages
-    const [validationErrors, setValidationErrors] = useState({});
-
-    // State containing the gender selection status
-    const [isFirstOption, setIsFirstSelection] = useState(true);
-
-    // Form state containing the loading status
-    const [isLoading, setIsLoading] = useState(false);
-
-    // Regular expressions for form validation
-    const firstNameRegex = /^[A-Za-z]{2,}$/;
-    const lastNameRegex = /^[A-Za-z]{2,}$/;
-    const userNameRegex = /^[a-zA-Z][a-zA-Z0-9]{2,15}$/;
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/
-
+    
     // Form validation functions
     const validator = {
         firstName: value => firstNameRegex.test(value),
@@ -63,17 +71,14 @@ const RegisterForm = () => {
         rePassword: value => value === registerFormData.password,
     };
 
-    // Error messages for form validation
-    const errorMessages = {
-        firstName: 'First name must have at least 2 characters and contain only letters.',
-        lastName: 'Last name must have at least 2 characters and contain only letters.',
-        gender: 'Field cannot be empty',
-        country: 'Field cannot be empty',
-        userName: 'Username must contain only letters and numbers and must start with a letter.',
-        email: 'Invalid email address.',
-        password: 'Password must contain at least 8 characters, one uppercase and lowercase letter, one number and one special character.',
-        rePassword: 'Passwords do not match.',
-    };
+    // Form state containing the validation error messages
+    const [validationErrors, setValidationErrors] = useState({});
+
+    // State containing the gender selection status
+    const [isFirstOption, setIsFirstSelection] = useState(true);
+
+    // Form state containing the loading status
+    const [isLoading, setIsLoading] = useState(false);
 
     // Log the validation errors
     useEffect(() => {

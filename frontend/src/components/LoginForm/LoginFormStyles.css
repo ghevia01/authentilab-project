@@ -28,7 +28,6 @@
 
 .username-input {
 
-    font-size: 0.9375em;
     width: 85%;
     height: 2em;
     margin: 0 auto 1.5em auto;
@@ -47,7 +46,6 @@
 
 .password-input {
 
-    font-size: 0.9375em;
     width: 100%;
     border: none;
     background-color: transparent;
@@ -57,8 +55,9 @@
 
 .password-icon-btn {
 
-    background: none;
+    width: 25px;
     border: none;
+    background: none;
     cursor: pointer;
 }
 
