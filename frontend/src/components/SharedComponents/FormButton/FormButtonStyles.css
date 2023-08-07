@@ -24,3 +24,15 @@
     background: #FF8C00;
     transform: translateY(1px);
 }
+
+.form-button:disabled {
+
+    background-color: #ccc;
+    box-shadow: 0 3px 3px 0 #545454;
+    cursor: default;
+}
+
+.form-button:disabled:active {
+
+    transform: none;
+}

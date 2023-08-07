@@ -28,8 +28,6 @@ const errorMessages = {
     rePassword: 'Passwords do not match.',
 };
 
-
-
 //------------------------------------------------------ Register Form Component --------------------------------------------------------->
 
 const RegisterForm = () => {
@@ -57,6 +55,7 @@ const RegisterForm = () => {
         userName: false,
         email: false,
         password: false,
+        rePassword: false
     });
     
     // Form validation functions
@@ -71,6 +70,9 @@ const RegisterForm = () => {
         rePassword: value => value === registerFormData.password,
     };
 
+    // Form validation status
+    let isFormValid = Object.values(validationStatus).every(status => status === true);
+
     // Form state containing the validation error messages
     const [validationErrors, setValidationErrors] = useState({});
 
@@ -80,6 +82,8 @@ const RegisterForm = () => {
     // Form state containing the loading status
     const [isLoading, setIsLoading] = useState(false);
 
+    //------------------------------------------------------ Form Effects --------------------------------------------------------->
+
     // Log the validation errors
     useEffect(() => {
         console.log(validationErrors);
@@ -87,16 +91,12 @@ const RegisterForm = () => {
 
     //------------------------------------------------------ Form Handlers --------------------------------------------------------->
 
-
     // Handle the form submit event
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        // Destructure the loginFormData object
-        const { formIsValid } = formValidation();
-
         // If the form is valid, send the register form data to the server
-        if (formIsValid) {
+        if (isFormValid) {
 
             // Reset the validation error messages
             resetValidationErrors();
@@ -195,28 +195,6 @@ const RegisterForm = () => {
 
     //------------------------------------------------------ Form Validation and Handlers --------------------------------------------------------->
 
-    // Form validation function
-    const formValidation = () => {
-
-        // Form validation status
-        let formIsValid = false;
-
-        // Validate each form input
-        for (let field in registerFormData) {
-            validateField(field, registerFormData[field]);
-        }
-
-        // Array containing the validation status of each form input
-        const validationArray = Object.values(validationStatus);
-
-        // If every form input is valid, set the form validation status to true
-        if (validationArray.every(Boolean)) {
-            formIsValid = true;
-        }
-
-        return { formIsValid };
-    }
-
     // Handle the input change event
     const handleInputChange = (e) => {
 
@@ -296,7 +274,7 @@ const RegisterForm = () => {
                     <div className='register-fieldset-container flex-center flex-wrap'>
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="firstName">First Name</label>
+                            <label className="register-input-label" htmlFor="firstName">First Name<sup> *</sup></label>
                             <InputField
                                 className='register-input-field'
                                 type="text"
@@ -312,7 +290,7 @@ const RegisterForm = () => {
                         </div>
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="lastName">Last Name</label>
+                            <label className="register-input-label" htmlFor="lastName">Last Name<sup> *</sup></label>
                             <InputField
                                 className='register-input-field'
                                 type="text"
@@ -328,7 +306,7 @@ const RegisterForm = () => {
                         </div>
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="email">Email</label>
+                            <label className="register-input-label" htmlFor="email">Email<sup> *</sup></label>
                             <InputField
                                 className='register-input-field'
                                 type="text"
@@ -345,7 +323,7 @@ const RegisterForm = () => {
 
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="country">Country</label>
+                            <label className="register-input-label" htmlFor="country">Country<sup> *</sup></label>
                             <InputField
                                 className='register-input-field'
                                 type="text"
@@ -361,7 +339,7 @@ const RegisterForm = () => {
                         </div>
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="gender">Gender</label>
+                            <label className="register-input-label" htmlFor="gender">Gender<sup> *</sup></label>
                             <select
                                 className={`register-input-field ${isFirstOption ? 'select-gender-placeholder' : ''}`}
                                 value={registerFormData.gender}
@@ -383,7 +361,7 @@ const RegisterForm = () => {
                         </div>
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="userName">Username</label>
+                            <label className="register-input-label" htmlFor="userName">Username<sup> *</sup></label>
                             <InputField
                                 className='register-input-field'
                                 type="text"
@@ -399,7 +377,7 @@ const RegisterForm = () => {
                         </div>
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="password">Password</label>
+                            <label className="register-input-label" htmlFor="password">Password<sup> *</sup></label>
                             <InputField
                                 className='register-input-field'
                                 type="password"
@@ -415,7 +393,7 @@ const RegisterForm = () => {
                         </div>
 
                         <div className='register-field-container'>
-                            <label className="register-input-label" htmlFor="rePassword">Re-enter Password</label>
+                            <label className="register-input-label" htmlFor="rePassword">Re-enter Password<sup> *</sup></label>
                             <InputField
                                 className='register-input-field'
                                 type="password"
@@ -442,9 +420,10 @@ const RegisterForm = () => {
                 <FormButton
                     className='signup-btn'
                     type="submit"
-                    id='loginBtn'
-                    name='loginBtn'
+                    id='signupBtn'
+                    name='signupBtn'
                     text='Sign Up'
+                    disabled={!isFormValid}
                 />
 
                 <small className="sign-in-text">

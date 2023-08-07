@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
@@ -9,12 +10,32 @@ import LoadingAnimation from '../SharedComponents/LoadingAnimation/LoadingAnimat
 
 import './LoginFormStyles.css';
 
+// ------------------------------------------------------ Variables and Constants --------------------------------------------------------->
+
+// Default login form state data
+const defaultLoginData = {
+    userName: '',
+    password: '',
+};
+
+const defaultValidationStatus = {
+    userName: false,
+    password: false
+};
+
+// Default validation status state data
+const defaultValidationErrors = {
+    userName: '',
+    password: '',
+};
+
 // Error messages for form validation
 const errorMessages = {
-
     userName: 'Enter a valid username or email address.',
     password: 'Enter a valid password.',
 };
+
+// ------------------------------------------------------ LoginForm Component --------------------------------------------------------->
 
 // Login form component
 const LoginForm = () => {
@@ -22,22 +43,13 @@ const LoginForm = () => {
     //------------------------------------------------------ Form States --------------------------------------------------------->
 
     // Form state containing the input field values
-    const [loginFormData, setLoginFormData] = useState({
-        userName: '',
-        password: ''
-    });
+    const [loginFormData, setLoginFormData] = useState(defaultLoginData);
 
     // Form state containing the validation status
-    const [validationStatus, setValidationStatus] = useState({
-        userName: false,
-        password: false
-    });
+    const [validationStatus, setValidationStatus] = useState(defaultValidationStatus);
 
     // Form state containing the validation error messages
-    const [validationErrors, setValidationErrors] = useState({
-        userName: '',
-        password: ''
-    });
+    const [validationErrors, setValidationErrors] = useState(defaultValidationErrors);
 
     // Form state containing the password visibility status
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -48,16 +60,23 @@ const LoginForm = () => {
     // Form state containing the loading status
     const [isLoading, setIsLoading] = useState(false);
 
-    // Log the updated validationErrors whenever it changes
+    //------------------------------------------------------ Form Effects --------------------------------------------------------->
+
+    // Log the form data to the console for debugging purposes
     useEffect(() => {
-        console.log(validationErrors);
-    }, [validationErrors]);
+        console.log('loginFormData: ', loginFormData);
+    }, [loginFormData]);
+
+     // Log the validation status and validation errors to the console for debugging purposes
+     useEffect(() => {
+        console.log('validationStatus: ', validationStatus);
+        console.log('validationErrors: ', validationErrors);
+    }, [validationStatus, validationErrors]);
 
     //------------------------------------------------------ Form Handlers --------------------------------------------------------->
 
     // Handle input change when user types in the input field
     const handleInputChange = (e) => {
-
         const { name, value } = e.target;
         setLoginFormData({ ...loginFormData, [name]: value });
     };
@@ -70,10 +89,10 @@ const LoginForm = () => {
         setIsFormSubmitted(true);
 
         // Destructure the loginFormData object
-        const { formIsValid } = formValidation();
+        const { isFormValid } = formValidation();
 
         // If the form is valid, send the login form data to the server
-        if (formIsValid) {
+        if (isFormValid) {
 
             // Reset the validation error messages
             resetValidationErrors();
@@ -110,7 +129,8 @@ const LoginForm = () => {
 
             } finally {
 
-                setIsLoading(false); // Set the loading state back to false
+                // Set the loading state back to false
+                setIsLoading(false); 
             }
         }
     }; 
@@ -122,6 +142,7 @@ const LoginForm = () => {
         const { userName, password } = loginFormData;
         
         try {
+
             // Send the login form data to the server
             const response = await fetch(`${process.env.REACT_APP_LOGIN_URL}`, {
                 method: 'POST',
@@ -156,9 +177,9 @@ const LoginForm = () => {
         }
     };
     
-    //------------------------------------------------------ Form Validation --------------------------------------------------------->
+    //------------------------------------------------------ Validation Functions --------------------------------------------------------->
 
-    // Form Validation Functions
+    // Validate Form
     const formValidation = () => {
 
         // Create new states for validation errors and validation status
@@ -181,10 +202,10 @@ const LoginForm = () => {
         setValidationStatus(newValidationStatus);
 
         // Check if all the form inputs are valid
-        const formIsValid = areAllFieldsValid(newValidationStatus);
+        const isFormValid = areAllFieldsValid(newValidationStatus);
 
         // Return true or false
-        return { formIsValid };
+        return { isFormValid };
     };
 
     // Validate each form input field
@@ -222,22 +243,19 @@ const LoginForm = () => {
 
     // Reset the validation error messages
     const resetValidationErrors = () => {
-        setValidationErrors({
-            userName: '',
-            password: ''
-        });
+        setValidationErrors(defaultValidationErrors);
     };
 
     // Reset the form input fields and set the form to not submitted
     const loginFormReset = () => {
-
-        setLoginFormData({ userName: '', password: '' });
+        setLoginFormData(defaultLoginData);
         setIsFormSubmitted(false);
         resetValidationErrors();
     };
     
     //------------------------------------------------------ Form Toggles --------------------------------------------------------->
 
+    // Toggle the password visibility
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
     };
@@ -305,7 +323,8 @@ const LoginForm = () => {
             {/* If the loading state is true, display the loading spinner */}
             {isLoading && (
                 <LoadingAnimation />
-            )}
+            )} 
+
         </form>
     );
 };
