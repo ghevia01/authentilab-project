@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { Link } from 'react-router-dom';
 
 import InputField from '../SharedComponents/InputField/InputField';
@@ -7,14 +7,41 @@ import LoadingAnimation from '../SharedComponents/LoadingAnimation/LoadingAnimat
 
 import './RegisterFormStyles.css';
 
-// ------------------------------------------------------ Register Form Var and Const and Objects --------------------------------------------------------->
+// ------------------------------------------------------ Register Form Vars, Consts and Objects --------------------------------------------------------->
 
-// Regular expressions for form validation
-const firstNameRegex = /^[A-Za-z]{2,}$/;
-const lastNameRegex = /^[A-Za-z]{2,}$/;
-const userNameRegex = /^[a-zA-Z][a-zA-Z0-9]{2,15}$/;
-const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/
+// Default register form data
+const defaultRegisterFormData = {
+    firstName: '',
+    lastName: '',
+    gender: '',
+    country: '',
+    userName: '',
+    email: '',
+    password: '',
+    rePassword: '',
+};
+
+// Default validation status
+const defaultValidationStatus = {
+    firstName: false,
+    lastName: false,
+    gender: false,
+    country: false,
+    userName: false,
+    email: false,
+    password: false,
+    rePassword: false,
+};
+
+// Default validation errors
+const defaultValidationErrors = {};
+
+// Create the initial form state for the Reducer
+const initialRegisterFormState = {
+    registerFormData: defaultRegisterFormData,
+    validationStatus: defaultValidationStatus,
+    validationErrors: defaultValidationErrors,
+};
 
 // Error messages for form validation
 const errorMessages = {
@@ -27,54 +54,87 @@ const errorMessages = {
     password: 'Password must contain at least 8 characters, one uppercase and lowercase letter, one number and one special character.',
     rePassword: 'Passwords do not match.',
 };
+// Regular expressions for form validation
+const regExpressions = {
+    firstNameRegex: /^[A-Za-z]{2,}$/,
+    lastNameRegex: /^[A-Za-z]{2,}$/,
+    userNameRegex: /^[a-zA-Z][a-zA-Z0-9]{2,15}$/,
+    emailRegex: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+    passwordRegex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/,
+};
 
 //------------------------------------------------------ Register Form Component --------------------------------------------------------->
 
 const RegisterForm = () => {
 
-    // Form data state containing username and password
-    const [registerFormData, setRegisterFormData] = useState({
+    //------------------------------------------------------ Form Reducer --------------------------------------------------------->
 
-        firstName: '',
-        lastName: '',
-        gender: '',
-        country: '',
-        userName: '',
-        email: '',
-        password: '',
-        rePassword: ''
-    });
+    // Register form reducer
+    const registerFormReducer = (state, action) => {
 
-    // Form state containing the form validation status
-    const [validationStatus, setValidationStatus] = useState({
+        // Switch between the action types
+        switch (action.type) {
 
-        firstName: false,
-        lastName: false,
-        gender: false,
-        country: false,
-        userName: false,
-        email: false,
-        password: false,
-        rePassword: false
-    });
-    
+            // Update the register form data
+            case 'UPDATE_REGISTER_FORM_DATA':
+                return {
+                    ...state,
+                    registerFormData: { ...state.registerFormData, [action.field]: action.value },
+                };
+
+            // Update the validation status
+            case 'UPDATE_VALIDATION_STATUS':
+                return {
+                    ...state,
+                    validationStatus: { ...state.validationStatus, [action.field]: action.status },
+                };
+
+            // Update the validation errors
+            case 'UPDATE_VALIDATION_ERRORS':
+                return {
+                    ...state,
+                    validationErrors: { ...state.validationErrors, [action.field]: action.error },
+                };
+
+            // Reset the validation errors
+            case 'RESET_VALIDATION_ERRORS':
+                return {
+                    ...state,
+                    validationErrors: defaultValidationErrors,
+                }
+
+            // Reset the register form
+            case 'RESET_REGISTER_FORM':
+                return {
+                    ...state,
+                    registerFormData: defaultRegisterFormData,
+                    validationStatus: defaultValidationStatus,
+                    validationErrors: defaultValidationErrors,
+                }
+
+            // Return the default state
+            default:
+                return state;
+        }
+    };
+
+    // Register form reducer hook
+    const [state, dispatch] = useReducer(registerFormReducer, initialRegisterFormState);
+
     // Form validation functions
     const validator = {
-        firstName: value => firstNameRegex.test(value),
-        lastName: value => lastNameRegex.test(value),
+        firstName: value => regExpressions.firstNameRegex.test(value),
+        lastName: value => regExpressions.lastNameRegex.test(value),
         gender: value => value !== '',
         country: value => value !== '',
-        userName: value => userNameRegex.test(value),
-        email: value => emailRegex.test(value),
-        password: value => passwordRegex.test(value),
-        rePassword: value => value === registerFormData.password,
+        userName: value => regExpressions.userNameRegex.test(value),
+        email: value => regExpressions.emailRegex.test(value),
+        password: value => regExpressions.passwordRegex.test(value),
+        rePassword: value => value === state.registerFormData.password,
     };
 
     // Form validation status
-    let isFormValid = Object.values(validationStatus).every(status => status === true);
-
-    // Form state containing the validation error messages
-    const [validationErrors, setValidationErrors] = useState({});
+    let isFormValid = Object.values(state.validationStatus).every(status => status === true);
 
     // State containing the gender selection status
     const [isFirstOption, setIsFirstSelection] = useState(true);
@@ -86,8 +146,8 @@ const RegisterForm = () => {
 
     // Log the validation errors
     useEffect(() => {
-        console.log(validationErrors);
-    }, [validationErrors]);
+        console.log(state);
+    }, [state]);
 
     //------------------------------------------------------ Form Handlers --------------------------------------------------------->
 
@@ -113,7 +173,7 @@ const RegisterForm = () => {
                 if (response.status === 200) {
 
                     console.log(data);
-                    registerFormReset();
+                    resetRegisterForm();
                 }
 
                 // If the response is not ok, display the error message
@@ -143,16 +203,9 @@ const RegisterForm = () => {
     // Send the register form data to the server
     const sendRegisterFormData = async (e) => {
 
-        // Destructure the loginFormData object
-        const {
-            firstName,
-            lastName,
-            gender,
-            country,
-            userName,
-            email,
-            password
-        } = registerFormData;
+        // Destructure the register form data (we destructure the rePassword field because 
+        // we don't need it in the request body and send only the rest of the data using the spread operator)
+        const { rePassword, ...dataToSend } = state.registerFormData;
 
         try {
 
@@ -160,15 +213,7 @@ const RegisterForm = () => {
             const response = await fetch(`${process.env.REACT_APP_REGISTER_URL}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    firstName,
-                    lastName,
-                    gender,
-                    country,
-                    userName,
-                    email,
-                    password
-                })
+                body: JSON.stringify(dataToSend),
             });
 
             // Get the response from the server and log it
@@ -202,7 +247,7 @@ const RegisterForm = () => {
         const { name, value } = e.target;
 
         // Set the form data
-        setRegisterFormData({ ...registerFormData, [name]: value });
+        dispatch({ type: 'UPDATE_REGISTER_FORM_DATA', field: name, value: value })
 
         // Validate the input
         validateField(name, value);
@@ -213,45 +258,33 @@ const RegisterForm = () => {
 
         // If the value is empty, set the error message and return false
         if (value === '') {
-            setValidationErrors((validationErrors) => ({ ...validationErrors, [name]: "Field cannot be empty" }));
-            setValidationStatus((validationStatus) => ({ ...validationStatus, [name]: false }));
+            dispatch({ type: "UPDATE_VALIDATION_STATUS", field: name, status: false })
+            dispatch({ type: "UPDATE_VALIDATION_ERRORS", field: name, error: "Field cannot be empty" })
         }
 
         // If the value is invalid, set the error message and return false
         else if (!validator[name](value)) {
-            setValidationErrors((validationErrors) => ({ ...validationErrors, [name]: errorMessages[name] }));
-            setValidationStatus((validationStatus) => ({ ...validationStatus, [name]: false }));
+            dispatch({ type: "UPDATE_VALIDATION_STATUS", field: name, status: false })
+            dispatch({ type: "UPDATE_VALIDATION_ERRORS", field: name, error: errorMessages[name] })
         }
 
         // If the value is valid, set the error message and return true
         else {
-            setValidationErrors((validationErrors) => ({ ...validationErrors, [name]: "" }));
-            setValidationStatus((validationStatus) => ({ ...validationStatus, [name]: true }));
+            dispatch({ type: "UPDATE_VALIDATION_STATUS", field: name, status: true })
+            dispatch({ type: "UPDATE_VALIDATION_ERRORS", field: name, vaerrorlue: "" })
         }
     };
 
     //------------------------------------------------------ Form Reset --------------------------------------------------------->
 
-    // Reset the form data
+    // Reset the validation Errors
     const resetValidationErrors = () => {
-        setValidationErrors({});
+        dispatch({ type: 'RESET_VALIDATION_ERRORS' });
     };
 
-    // Reset the form input fields and set the form to not submitted
-    const registerFormReset = () => {
-
-        setRegisterFormData({
-            firstName: '',
-            lastName: '',
-            gender: '',
-            country: '',
-            userName: '',
-            email: '',
-            password: '',
-            rePassword: ''
-        });
-
-        resetValidationErrors();
+    // Reset the form data
+    const resetRegisterForm = () => {
+        dispatch({ type: 'RESET_FORM' });
     };
 
     //------------------------------------------------------ Form Render --------------------------------------------------------->
@@ -280,12 +313,12 @@ const RegisterForm = () => {
                                 type="text"
                                 id="firstName" s
                                 name="firstName"
-                                value={registerFormData.firstName}
+                                value={state.registerFormData.firstName}
                                 onChange={handleInputChange}
                                 placeholder='Enter first name'
                             />
                             <div className="register-field-error-msg" >
-                                {validationErrors.firstName}
+                                {state.validationErrors.firstName}
                             </div>
                         </div>
 
@@ -296,12 +329,12 @@ const RegisterForm = () => {
                                 type="text"
                                 id="lastName"
                                 name="lastName"
-                                value={registerFormData.lastName}
+                                value={state.registerFormData.lastName}
                                 onChange={handleInputChange}
                                 placeholder='Enter last name'
                             />
                             <div className="register-field-error-msg" >
-                                {validationErrors.lastName}
+                                {state.validationErrors.lastName}
                             </div>
                         </div>
 
@@ -312,12 +345,12 @@ const RegisterForm = () => {
                                 type="text"
                                 id="email"
                                 name="email"
-                                value={registerFormData.email}
+                                value={state.registerFormData.email}
                                 onChange={handleInputChange}
                                 placeholder='someone@example.com'
                             />
                             <div className="register-field-error-msg" >
-                                {validationErrors.email}
+                                {state.validationErrors.email}
                             </div>
                         </div>
 
@@ -329,12 +362,12 @@ const RegisterForm = () => {
                                 type="text"
                                 id="country"
                                 name="country"
-                                value={registerFormData.country}
+                                value={state.registerFormData.country}
                                 onChange={handleInputChange}
                                 placeholder='Enter country'
                             />
                             <div className="register-field-error-msg" >
-                                {validationErrors.country}
+                                {state.validationErrors.country}
                             </div>
                         </div>
 
@@ -342,7 +375,7 @@ const RegisterForm = () => {
                             <label className="register-input-label" htmlFor="gender">Gender<sup> *</sup></label>
                             <select
                                 className={`register-input-field ${isFirstOption ? 'select-gender-placeholder' : ''}`}
-                                value={registerFormData.gender}
+                                value={state.registerFormData.gender}
                                 type="text"
                                 id="gender"
                                 name="gender"
@@ -356,7 +389,7 @@ const RegisterForm = () => {
                                 <option value="ratherNot">Rather not say</option>
                             </select>
                             <div className="register-field-error-msg" >
-                                {validationErrors.gender}
+                                {state.validationErrors.gender}
                             </div>
                         </div>
 
@@ -367,12 +400,12 @@ const RegisterForm = () => {
                                 type="text"
                                 id="userName"
                                 name="userName"
-                                value={registerFormData.userName}
+                                value={state.registerFormData.userName}
                                 onChange={handleInputChange}
                                 placeholder='Create username'
                             />
                             <div className="register-field-error-msg" >
-                                {validationErrors.userName}
+                                {state.validationErrors.userName}
                             </div>
                         </div>
 
@@ -383,12 +416,12 @@ const RegisterForm = () => {
                                 type="password"
                                 id="password"
                                 name="password"
-                                value={registerFormData.password}
+                                value={state.registerFormData.password}
                                 onChange={handleInputChange}
                                 placeholder="Create password"
                             />
                             <div className="register-field-error-msg" >
-                                {validationErrors.password}
+                                {state.validationErrors.password}
                             </div>
                         </div>
 
@@ -399,12 +432,12 @@ const RegisterForm = () => {
                                 type="password"
                                 id="rePassword"
                                 name="rePassword"
-                                value={registerFormData.rePassword}
+                                value={state.registerFormData.rePassword}
                                 onChange={handleInputChange}
                                 placeholder="Re-enter password"
                             />
                             <div className="register-field-error-msg" >
-                                {validationErrors.rePassword}
+                                {state.validationErrors.rePassword}
                             </div>
                         </div>
 

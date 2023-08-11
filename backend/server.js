@@ -65,26 +65,19 @@ const handleLoginRequest = async (req, res) => {
     // If error occurs
     else {
 
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        res.status(500).json({ success: false, message: 'An internal server error has ocurred' });
     }
 }
 
 const handleRegisterRequest = async (req, res) => {
 
     // Get user information from request body
-    const {
-        firstName,
-        lastName,
-        gender,
-        country,
-        userName,
-        email,
-        password } = req.body;
+    const userData = req.body;
 
     // Register user
     try {
         // Pass destructured properties to userRegistration function
-        const user = await userRegistration(firstName, lastName, gender, country, userName, email, password);
+        const user = await userRegistration(userData);
 
         // If user is found
         if (user) {
@@ -92,17 +85,9 @@ const handleRegisterRequest = async (req, res) => {
             res.status(200).json({ success: true, message: 'Registration successful' });
         }
 
-        // If user is not found
-        else if (!user) {
-
-            res.status(400).json({ success: false, message: 'Registration was not succesful' });
-        }
-
-        // If error occurs
-        else {
-
-            res.status(500).json({ success: false, message: 'Internal server error' });
-        }
+        // Else display error message
+        else 
+          res.status(500).json({ success: false, message: 'An internal server error has ocurred' });
 
     } catch (err) {
 

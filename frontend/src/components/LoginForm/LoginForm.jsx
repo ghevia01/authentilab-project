@@ -18,9 +18,10 @@ const defaultLoginData = {
     password: '',
 };
 
+// 
 const defaultValidationStatus = {
     userName: false,
-    password: false
+    password: false,
 };
 
 // Default validation status state data
@@ -67,8 +68,8 @@ const LoginForm = () => {
         console.log('loginFormData: ', loginFormData);
     }, [loginFormData]);
 
-     // Log the validation status and validation errors to the console for debugging purposes
-     useEffect(() => {
+    // Log the validation status and validation errors to the console for debugging purposes
+    useEffect(() => {
         console.log('validationStatus: ', validationStatus);
         console.log('validationErrors: ', validationErrors);
     }, [validationStatus, validationErrors]);
@@ -78,7 +79,7 @@ const LoginForm = () => {
     // Handle input change when user types in the input field
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setLoginFormData({ ...loginFormData, [name]: value });
+        setLoginFormData(loginFormData => ({ ...loginFormData, [name]: value }));
     };
 
     // Handle Form Submit when user clicks on the submit button
@@ -112,12 +113,12 @@ const LoginForm = () => {
                 } else if (response.status === 400) {
 
                     // Error message for unsuccessful login attempt
-                    setValidationErrors((validationErrors) => ({ ...validationErrors, userName: data.message }));
+                    setValidationErrors(validationErrors => ({ ...validationErrors, userName: data.message }));
 
                 } else {
 
                     // Show a general error message
-                    setValidationErrors((validationErrors) => ({ ...validationErrors, userName: response.statusText }));
+                    setValidationErrors(validationErrors => ({ ...validationErrors, userName: response.statusText }));
                 }
 
             } catch (error) {
@@ -125,47 +126,47 @@ const LoginForm = () => {
                 // Log and show a general error message
                 console.log(error);
                 const errorMessage = error.message || 'An error occurred while fetching the data';
-                setValidationErrors((validationErrors) => ({ ...validationErrors, userName: errorMessage }));
+                setValidationErrors(validationErrors => ({ ...validationErrors, userName: errorMessage }));
 
             } finally {
 
                 // Set the loading state back to false
-                setIsLoading(false); 
+                setIsLoading(false);
             }
         }
-    }; 
+    };
 
     // Send --POST-- request to the server with the login form data
     const sendUserLoginData = async (e) => {
 
         // Destructure the loginFormData object
-        const { userName, password } = loginFormData;
-        
+        const dataToSend = loginFormData;
+
         try {
 
             // Send the login form data to the server
             const response = await fetch(`${process.env.REACT_APP_LOGIN_URL}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userName, password })
+                body: JSON.stringify(dataToSend),
             });
-    
+
             // If the server response is not ok (e.g., status code is not 2xx), throw an error
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-    
+
             // Get the response from the server and log it
             const data = await response.json();
             console.log(data);
-            
+
             // Return the data and response
             return { data, response };
 
         } catch (error) {
-            
+
             console.error("Error occurred while fetching the data: ", error);
-    
+
             // Return a default error response
             return {
                 data: null,
@@ -176,7 +177,7 @@ const LoginForm = () => {
             };
         }
     };
-    
+
     //------------------------------------------------------ Validation Functions --------------------------------------------------------->
 
     // Validate Form
@@ -252,7 +253,7 @@ const LoginForm = () => {
         setIsFormSubmitted(false);
         resetValidationErrors();
     };
-    
+
     //------------------------------------------------------ Form Toggles --------------------------------------------------------->
 
     // Toggle the password visibility
@@ -306,7 +307,7 @@ const LoginForm = () => {
                     aria-label="Password"
                 />
                 <button type="button" className='password-icon-btn' onClick={togglePasswordVisibility}>
-                    <FontAwesomeIcon  className='password-eye-icon' icon={isPasswordVisible ? faEye : faEyeSlash} />
+                    <FontAwesomeIcon className='password-eye-icon' icon={isPasswordVisible ? faEye : faEyeSlash} />
                 </button>
             </div>
 
@@ -321,9 +322,9 @@ const LoginForm = () => {
             </small>
 
             {/* If the loading state is true, display the loading spinner */}
-            {isLoading && (
+            {isLoading &&
                 <LoadingAnimation />
-            )} 
+            }
 
         </form>
     );

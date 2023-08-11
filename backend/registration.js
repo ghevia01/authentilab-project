@@ -3,7 +3,7 @@
 const User = require('./UserModels/user');
 
 // Handle user registration
-const userRegistration = async (firstName, lastName, gender, country, userName, email, password) => {
+const userRegistration = async ({firstName, lastName, gender, country, userName, email, password}) => {
 
     // Check if user with this username or email already exists
     const userExists = await User.findOne({ $or: [ {username: userName}, {email: email} ] });
