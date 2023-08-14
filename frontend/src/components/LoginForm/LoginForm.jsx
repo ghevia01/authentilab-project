@@ -1,5 +1,8 @@
+// Importing Dependencies
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+// import { useFormik } from 'formik';
+// import * as Yup from 'yup';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -18,7 +21,7 @@ const defaultLoginData = {
     password: '',
 };
 
-// 
+// Default Validation status state data
 const defaultValidationStatus = {
     userName: false,
     password: false,
@@ -36,12 +39,30 @@ const errorMessages = {
     password: 'Enter a valid password.',
 };
 
+// const loginValidationSchema = Yup.object({
+//     username: Yup.string()
+//         .required('Enter a valid username or email address.'),
+//     password: Yup.string()
+//         .required('Enter a valid password.'),
+// });
+
 // ------------------------------------------------------ LoginForm Component --------------------------------------------------------->
 
 // Login form component
 const LoginForm = () => {
 
     //------------------------------------------------------ Form States --------------------------------------------------------->
+
+    // const formik = useFormik({
+    //     initialValues: {
+    //         username: '',
+    //         password: '',
+    //     },
+    //     validationSchema: loginValidationSchema,
+    //     onSubmit: (values) => {
+    //         handleFormSubmit(values);     
+    //     },
+    // });
 
     // Form state containing the input field values
     const [loginFormData, setLoginFormData] = useState(defaultLoginData);
@@ -67,12 +88,6 @@ const LoginForm = () => {
     useEffect(() => {
         console.log('loginFormData: ', loginFormData);
     }, [loginFormData]);
-
-    // Log the validation status and validation errors to the console for debugging purposes
-    useEffect(() => {
-        console.log('validationStatus: ', validationStatus);
-        console.log('validationErrors: ', validationErrors);
-    }, [validationStatus, validationErrors]);
 
     //------------------------------------------------------ Form Handlers --------------------------------------------------------->
 
