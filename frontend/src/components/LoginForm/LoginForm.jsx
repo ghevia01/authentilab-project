@@ -1,6 +1,8 @@
-// Importing Dependencies
+// ------------------------------------------------------ Importing Depenencies ------------------------------------------------------ //
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+import { sendUserLoginData } from '../../services/authService';
 // import { useFormik } from 'formik';
 // import * as Yup from 'yup';
 
@@ -119,7 +121,9 @@ const LoginForm = () => {
             try {
 
                 // Send the login form data to the server
-                const { data, response } = await sendUserLoginData();
+                const { data, response } = await sendUserLoginData(loginFormData);
+
+                console.log(data.message);
 
                 if (response.status === 200) {
 
@@ -140,56 +144,13 @@ const LoginForm = () => {
 
                 // Log and show a general error message
                 console.log(error);
-                const errorMessage = error.message || 'An error occurred while fetching the data';
-                setValidationErrors(validationErrors => ({ ...validationErrors, userName: errorMessage }));
+                setValidationErrors(validationErrors => ({ ...validationErrors, userName: error }));
 
             } finally {
 
                 // Set the loading state back to false
                 setIsLoading(false);
             }
-        }
-    };
-
-    // Send --POST-- request to the server with the login form data
-    const sendUserLoginData = async (e) => {
-
-        // Destructure the loginFormData object
-        const dataToSend = loginFormData;
-
-        try {
-
-            // Send the login form data to the server
-            const response = await fetch(`${process.env.REACT_APP_LOGIN_URL}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSend),
-            });
-
-            // If the server response is not ok (e.g., status code is not 2xx), throw an error
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            // Get the response from the server and log it
-            const data = await response.json();
-            console.log(data);
-
-            // Return the data and response
-            return { data, response };
-
-        } catch (error) {
-
-            console.error("Error occurred while fetching the data: ", error);
-
-            // Return a default error response
-            return {
-                data: null,
-                response: {
-                    status: 500,
-                    statusText: "An error occurred while fetching the data",
-                }
-            };
         }
     };
 

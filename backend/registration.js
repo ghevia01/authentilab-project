@@ -1,4 +1,3 @@
-
 // Import User model
 const User = require('./UserModels/user');
 
@@ -8,9 +7,13 @@ const userRegistration = async ({firstName, lastName, gender, country, userName,
     // Check if user with this username or email already exists
     const userExists = await User.findOne({ $or: [ {username: userName}, {email: email} ] });
 
-    // Throw error if user with this username or email already exists
+    // Return error if user already exists
     if (userExists) {
-        throw new Error('User with this username or email already exists');
+        return { 
+            user: null,
+            error: true,
+            message: 'User with this username or email already exists',
+         };
     }
 
     // Create a new user
@@ -24,13 +27,15 @@ const userRegistration = async ({firstName, lastName, gender, country, userName,
         password: password
     });
 
-    console.log(user);
-
     // Save user in the database
     await user.save();
 
     // Return user
-    return user;
+    return { 
+        user, 
+        error: false,
+        message: 'Registration was successful',
+    };
 };
 
 module.exports = { userRegistration };
