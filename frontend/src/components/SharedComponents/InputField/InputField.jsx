@@ -4,7 +4,7 @@ import "./InputFieldStyles.css";
 
 
 // Reusable input field component for forms. onChange function is optional.
-const InputField = ({ className, name, type, placeholder, value, onChange, ariaLabel}) => {
+const InputField = ({ className, name, type, placeholder, value, onChange, ariaLabel, autoComplete}) => {
 
     return (
         <input
@@ -16,6 +16,7 @@ const InputField = ({ className, name, type, placeholder, value, onChange, ariaL
             onChange={onChange}
             placeholder={placeholder}
             aria-label={ariaLabel}
+            autoComplete={autoComplete}
         />
     );
 }
@@ -31,7 +32,8 @@ InputField.propTypes = {
         PropTypes.number,
     ]).isRequired,
     onChange: PropTypes.func,
-    ariaLabel: PropTypes.string
+    ariaLabel: PropTypes.string.isRequired,
+    autoComplete: PropTypes.string,
 };
 
 // Default Props
@@ -39,7 +41,8 @@ InputField.defaultProps = {
     className: "",
     onChange: () => {},
     placeholder: "",
-    ariaLabel: ""
+    ariaLabel: "",
+    autoComplete: "off",
 };
 
 export default InputField;

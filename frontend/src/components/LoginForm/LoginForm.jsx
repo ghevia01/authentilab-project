@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { sendUserLoginData } from '../../services/authService';
-// import { useFormik } from 'formik';
-// import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -19,34 +19,23 @@ import './LoginFormStyles.css';
 
 // Default login form state data
 const defaultLoginData = {
-    userName: '',
+    username: '',
     password: '',
-};
-
-// Default Validation status state data
-const defaultValidationStatus = {
-    userName: false,
-    password: false,
 };
 
 // Default validation status state data
-const defaultValidationErrors = {
-    userName: '',
+const defaultServerErrors = {
+    username: '',
     password: '',
 };
 
-// Error messages for form validation
-const errorMessages = {
-    userName: 'Enter a valid username or email address.',
-    password: 'Enter a valid password.',
-};
-
-// const loginValidationSchema = Yup.object({
-//     username: Yup.string()
-//         .required('Enter a valid username or email address.'),
-//     password: Yup.string()
-//         .required('Enter a valid password.'),
-// });
+// Validation schema for formik
+const loginValidationSchema = Yup.object({
+    username: Yup.string()
+        .required('Enter a valid username or email address.'),
+    password: Yup.string()
+        .required('Enter a valid password.'),
+});
 
 // ------------------------------------------------------ LoginForm Component --------------------------------------------------------->
 
@@ -55,179 +44,94 @@ const LoginForm = () => {
 
     //------------------------------------------------------ Form States --------------------------------------------------------->
 
-    // const formik = useFormik({
-    //     initialValues: {
-    //         username: '',
-    //         password: '',
-    //     },
-    //     validationSchema: loginValidationSchema,
-    //     onSubmit: (values) => {
-    //         handleFormSubmit(values);     
-    //     },
-    // });
+    // Formik hook for handling the form state. Contains the form data (initialValues),
+    // validation schema (Yup object) and the submit function (onSubmit)
+    const formik = useFormik({
+        initialValues: defaultLoginData,
+        validationSchema: loginValidationSchema,
+        onSubmit: (values) => {
+            handleFormSubmit(values);
+        },
+    });
 
-    // Form state containing the input field values
-    const [loginFormData, setLoginFormData] = useState(defaultLoginData);
-
-    // Form state containing the validation status
-    const [validationStatus, setValidationStatus] = useState(defaultValidationStatus);
-
-    // Form state containing the validation error messages
-    const [validationErrors, setValidationErrors] = useState(defaultValidationErrors);
+    // Form state containing the server error messages
+    const [serverErrors, setServerErrors] = useState(defaultServerErrors);
 
     // Form state containing the password visibility status
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-    // Form state containing the form validation status
-    const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-
     // Form state containing the loading status
     const [isLoading, setIsLoading] = useState(false);
 
-    //------------------------------------------------------ Form Effects --------------------------------------------------------->
-
-    // Log the form data to the console for debugging purposes
     useEffect(() => {
-        console.log('loginFormData: ', loginFormData);
-    }, [loginFormData]);
+        console.log(formik.submitCount);
+        console.log(formik.values);
+        console.log(formik.errors);
+    }, [formik.submitCount, formik.values, formik.errors]);
 
     //------------------------------------------------------ Form Handlers --------------------------------------------------------->
 
-    // Handle input change when user types in the input field
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setLoginFormData(loginFormData => ({ ...loginFormData, [name]: value }));
-    };
-
     // Handle Form Submit when user clicks on the submit button
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
+    const handleFormSubmit = async (values) => {
 
-        // Set the form to submitted
-        setIsFormSubmitted(true);
+        // Reset the server error messages
+        resetServerErrors();
 
-        // Destructure the loginFormData object
-        const { isFormValid } = formValidation();
+        // Set the loading state to true
+        setIsLoading(true);
 
-        // If the form is valid, send the login form data to the server
-        if (isFormValid) {
+        try {
 
-            // Reset the validation error messages
-            resetValidationErrors();
+            // Send the user login data to the server through the authService api
+            const { data, response } = await sendUserLoginData(values);
 
-            // Set the loading state to true
-            setIsLoading(true);
+            if (response.status === 200) {
 
-            try {
+                // Reset the form
+                loginFormReset();
 
-                // Send the login form data to the server
-                const { data, response } = await sendUserLoginData(loginFormData);
+            } else if (response.status === 400) {
 
-                console.log(data.message);
+                // Error message for unsuccessful login attempt
+                setServerErrors(serverErrors => ({
+                    ...serverErrors,
+                    username: data.message,
+                }));
 
-                if (response.status === 200) {
+            } else if (response.status === 500) {
 
-                    loginFormReset(); // Reset the form input fields
-
-                } else if (response.status === 400) {
-
-                    // Error message for unsuccessful login attempt
-                    setValidationErrors(validationErrors => ({ ...validationErrors, userName: data.message }));
-
-                } else {
-
-                    // Show a general error message
-                    setValidationErrors(validationErrors => ({ ...validationErrors, userName: response.statusText }));
-                }
-
-            } catch (error) {
-
-                // Log and show a general error message
-                console.log(error);
-                setValidationErrors(validationErrors => ({ ...validationErrors, userName: error }));
-
-            } finally {
-
-                // Set the loading state back to false
-                setIsLoading(false);
+                // Log and show the server error message
+                setServerErrors(serverErrors => ({
+                    ...serverErrors,
+                    username: (data && data.message ? data.message : response.statusText),
+                }));
             }
+        } catch (err) {
+
+            // Show a general error message
+            setServerErrors(serverErrors => ({
+                ...serverErrors,
+                username: err.toString(),
+            }));
+
+        } finally {
+
+            // Set the loading state back to false
+            setIsLoading(false);
         }
     };
-
-    //------------------------------------------------------ Validation Functions --------------------------------------------------------->
-
-    // Validate Form
-    const formValidation = () => {
-
-        // Create new states for validation errors and validation status
-        const newValidationErrors = { ...validationErrors };
-        const newValidationStatus = { ...validationStatus };
-
-        // Validate each form input
-        for (let field in loginFormData) {
-
-            // Validate each form input field
-            const { isValid, errorMessage } = validateField(field, loginFormData[field]);
-
-            // Set the new states
-            newValidationStatus[field] = isValid;
-            newValidationErrors[field] = errorMessage;
-        }
-
-        // Set the new states
-        setValidationErrors(newValidationErrors);
-        setValidationStatus(newValidationStatus);
-
-        // Check if all the form inputs are valid
-        const isFormValid = areAllFieldsValid(newValidationStatus);
-
-        // Return true or false
-        return { isFormValid };
-    };
-
-    // Validate each form input field
-    const validateField = (field, value) => {
-
-        // If the value is empty, set the error message and return false
-        if (value === '') {
-
-            // Return false if the value is empty and set the error message
-            return {
-                isValid: false,
-                errorMessage: errorMessages[field]
-            }
-        }
-
-        // Return true if the value is not empty and set the error message to empty string
-        else {
-
-            // Return true if the value is not empty and set the error message to empty string
-            return {
-                isValid: true,
-                errorMessage: '',
-            };
-        }
-    }
-
-    // Check if all the form inputs are valid
-    const areAllFieldsValid = (validationStatus) => {
-
-        // Check if all the form inputs are valid and return true or false
-        return Object.values(validationStatus).every(Boolean);
-    }
 
     //------------------------------------------------------ Form Reset --------------------------------------------------------->
 
     // Reset the validation error messages
-    const resetValidationErrors = () => {
-        setValidationErrors(defaultValidationErrors);
+    const resetServerErrors = () => {
+        setServerErrors(defaultServerErrors);
     };
 
     // Reset the form input fields and set the form to not submitted
     const loginFormReset = () => {
-        setLoginFormData(defaultLoginData);
-        setIsFormSubmitted(false);
-        resetValidationErrors();
+        formik.resetForm();
+        resetServerErrors();
     };
 
     //------------------------------------------------------ Form Toggles --------------------------------------------------------->
@@ -239,35 +143,38 @@ const LoginForm = () => {
 
     //------------------------------------------------------ Form Rendering --------------------------------------------------------->
 
-    // Render Login Form
     return (
 
-        <form className="login-form-container flex flex-align-center flex-direction-column" onSubmit={handleFormSubmit}>
+        <form className="login-form-container flex flex-align-center flex-direction-column" onSubmit={formik.handleSubmit}>
 
             <h1 className='login-form-h1'>Authentilab</h1>
 
             <hr className='login-form-hr' />
 
-            {/* If the form is submitted and there is a validation error for the field, display the error message */}
-            {isFormSubmitted && validationErrors.userName && (
-                <p className="login-error-msg">{validationErrors.userName}</p>
+            {/* If the form is submitted and there is a validation error for the field or a server error, display the error message */}
+            {(formik.submitCount > 0) && (formik.errors.username || serverErrors.username) && (
+                <p className="login-error-msg">
+                    {formik.errors.username || serverErrors.username}
+                </p>
             )}
 
             {/* Username input field */}
             <InputField
                 className='username-input'
                 type="text"
-                id="userName"
-                name="userName"
-                value={loginFormData.userName}
-                onChange={handleInputChange}
+                id="username"
+                name="username"
+                value={formik.values.username}
+                onChange={formik.handleChange}
                 placeholder="Username or email"
                 aria-label="Username or email"
             />
 
-            {/* If the form is submitted and there is a validation error for the field, display the error message */}
-            {isFormSubmitted && validationErrors.password && (
-                <p className="login-error-msg">{validationErrors.password}</p>
+            {/* If the form is submitted and there is a validation error for the field or a server error, display the error message */}
+            {(formik.submitCount > 0) && (formik.errors.password || serverErrors.password) && (
+                <p className="login-error-msg">
+                    {formik.errors.password || serverErrors.password}
+                </p>
             )}
 
             {/* Password input field */}
@@ -277,10 +184,11 @@ const LoginForm = () => {
                     type={isPasswordVisible ? "text" : "password"}
                     id="password"
                     name="password"
-                    value={loginFormData.password}
-                    onChange={handleInputChange}
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
                     placeholder="Password"
                     aria-label="Password"
+                    autoComplete="current-password"
                 />
                 <button type="button" className='password-icon-btn' onClick={togglePasswordVisibility}>
                     <FontAwesomeIcon className='password-eye-icon' icon={isPasswordVisible ? faEye : faEyeSlash} />

@@ -39,6 +39,7 @@ connectToMongoDB();
 const handleLoginRequest = async (req, res) => {
 
     try {
+
         // Get username and password from request body
         const { userName, password } = req.body;
 
@@ -59,7 +60,7 @@ const handleLoginRequest = async (req, res) => {
                 success: false,
                 message: message,
             });
-        }      
+        }
     } catch (err) {
 
         // If an internal server error has ocurred
