@@ -3,10 +3,10 @@ const bcrypt = require('bcrypt');
 const User = require('./UserModels/user');
 
 // Authenticate user
-const userAuthentication = async (userName, password) => {
+const userAuthentication = async (username, password) => {
 
     // Find user with matching username
-    const user = await User.findOne({ username: userName });
+    const user = await User.findOne({ username: username });
 
     // If no user is found or password validation fails, return error
     if (!user || !(await bcrypt.compare(password, user.password))) {

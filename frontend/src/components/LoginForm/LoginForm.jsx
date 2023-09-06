@@ -87,6 +87,8 @@ const LoginForm = () => {
 
             if (response.status === 200) {
 
+                console.log(data);
+                
                 // Reset the form
                 loginFormReset();
 

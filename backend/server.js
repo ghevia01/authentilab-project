@@ -41,10 +41,10 @@ const handleLoginRequest = async (req, res) => {
     try {
 
         // Get username and password from request body
-        const { userName, password } = req.body;
+        const { username, password } = req.body;
 
         // Pass username and password to userAuthentication function for authentication
-        const { user, error, message } = await userAuthentication(userName, password);
+        const { user, error, message } = await userAuthentication(username, password);
 
         // If user was authenticated
         if (user) {
